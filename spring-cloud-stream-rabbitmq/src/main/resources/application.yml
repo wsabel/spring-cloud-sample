@@ -1,0 +1,41 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: pring-cloud-stream-rabbitmq
+  rabbitmq:
+    host: 192.168.56.102
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        acknowledge-mode: MANUAL
+  cloud:
+    stream:
+      rabbit:
+        bindings:
+          myinput:
+            consumer:
+              acknowledge-mode: MANUAL
+              recovery-interval: 3000
+              auto-bind-dlq: false
+              deadLetterExchange: mydlx
+              deadLetterQueueName: mydlx.mydlq
+          dlqinput:
+            consumer:
+              acknowledgeMode: MANUAL
+      bindings:
+        dlqinput:
+          destination: mydlx
+          group: mydlq
+        myinput:
+          destination: ministream
+          group: mygroup
+          consumer:
+            maxAttempts: 5
+        myoutput:
+          destination: ministream
+
+
+
