@@ -5,6 +5,8 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.LongString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -31,13 +33,37 @@ public class MySimpleReceiver {
     /**
      * Normal listening
      * */
-    @StreamListener("myinput")
+//    @RabbitListener(queues = "ministream.mygroup")
     public void handle(@Payload String message,
-                       @Header(AmqpHeaders.CHANNEL) Channel channel,
-                       @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) throws IOException {
+                       Channel channel,
+                       @Header("messageId") String msgId,
+                       @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) throws IOException, InterruptedException {
         logger.info("my receiver: {}",message);
+        logger.info("message id: {}",msgId);
 //        throw new RuntimeException("Message consumer failed!");
+//        Thread.sleep(60000*90);
         channel.basicAck(deliveryTag,false);
+    }
+    @RabbitListener(queues = "biz-queue")
+    public void handle1(String msg,Channel channel,Message message) throws IOException, InterruptedException {
+        try {
+            logger.info("my receiver: {}",msg);
+            logger.info("message id: {}",message.getMessageProperties().getMessageId());
+//            throw new RuntimeException("Message consumer failed!");
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(),false,false);
+        }
+//        Thread.sleep(60000*90);
+    }
+    @RabbitListener(queues = "dlx-queue")
+    public void handle2(String msg,Channel channel,Message message) throws IOException, InterruptedException {
+        logger.info("my dlx receiver: {}",msg);
+        logger.info("message id: {}",message.getMessageProperties().getMessageId());
+//        throw new RuntimeException("Message consumer failed!");
+//        Thread.sleep(60000*90);
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
     }
 
     /**
@@ -53,7 +79,7 @@ public class MySimpleReceiver {
     /**
      * listen dead letter queue
      * */
-    @StreamListener("dlqinput")
+    @RabbitListener(queues = "mydlx.mydlq")
     public void handledlq(@Payload String message,
                         @Header(AmqpHeaders.CHANNEL) Channel channel,
                         @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag,

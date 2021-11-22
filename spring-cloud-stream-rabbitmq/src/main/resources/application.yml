@@ -11,31 +11,34 @@ spring:
     listener:
       simple:
         acknowledge-mode: MANUAL
-  cloud:
-    stream:
-      rabbit:
-        bindings:
-          myinput:
-            consumer:
-              acknowledge-mode: MANUAL
-              recovery-interval: 3000
-              auto-bind-dlq: false
-              deadLetterExchange: mydlx
-              deadLetterQueueName: mydlx.mydlq
-          dlqinput:
-            consumer:
-              acknowledgeMode: MANUAL
-      bindings:
-        dlqinput:
-          destination: mydlx
-          group: mydlq
-        myinput:
-          destination: ministream
-          group: mygroup
-          consumer:
-            maxAttempts: 5
-        myoutput:
-          destination: ministream
+        retry:
+          enabled: true
+          max-attempts: 3
+#  cloud:
+#    stream:
+#      rabbit:
+#        bindings:
+#          myinput:
+#            consumer:
+#              acknowledge-mode: MANUAL
+#              recovery-interval: 3000
+#              auto-bind-dlq: false
+#              deadLetterExchange: mydlx
+#              deadLetterQueueName: mydlx.mydlq
+#          dlqinput:
+#            consumer:
+#              acknowledgeMode: MANUAL
+#      bindings:
+#        dlqinput:
+#          destination: mydlx
+#          group: mydlq
+#        myinput:
+#          destination: ministream
+#          group: mygroup
+#          consumer:
+#            maxAttempts: 5
+#        myoutput:
+#          destination: ministream
 
 
 

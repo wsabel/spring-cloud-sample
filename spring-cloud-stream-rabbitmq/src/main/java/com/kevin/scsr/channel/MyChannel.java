@@ -7,10 +7,10 @@ import org.springframework.messaging.SubscribableChannel;
 
 
 public interface MyChannel {
-    @Input("dlqinput")
-    SubscribableChannel dlqinput();
-    @Input("myinput")
-    SubscribableChannel input();
-    @Output("myoutput")
-    MessageChannel output();
+//    @Input("dlqinput")
+//    SubscribableChannel dlqinput();
+//    @Input("myinput")
+//    SubscribableChannel input();
+//    @Output("myoutput")
+//    MessageChannel output();
 }
