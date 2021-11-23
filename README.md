@@ -1,3 +1,3 @@
 
 # Introduction
-Some simple sample of spring cloud components
+This branch aims to show the integration of spring and rabbitmq directly in sub-module of spring-cloud-stream-rabbitmq
